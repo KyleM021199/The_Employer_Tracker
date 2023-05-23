@@ -5,12 +5,14 @@ const inquirer = require('inquirer');
 class Questionaire{
   runOpChoice(){  
     return inquirer
-    .prompt()[{
+    .prompt([
+      {
       type:'list',
       message:'Choose employee list operation:',
       name: 'opChoice',
       choices: ['Add Department', 'Add Role', 'Add Employee', 'Update Employee Role','View All Roles','View All Employees', 'View All Departments']
-     }] .then((respond) => {
+      }
+     ]) .then((respond) => {
       if (respond === 'Add Department'){
         this.runAddDepartment();
       }else if(respond === 'Add Role'){
