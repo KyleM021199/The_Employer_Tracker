@@ -45,7 +45,8 @@ class Questionaire{
     }
    ]).then(({addDepartment}) => {
     console.log("Running");
-    db.query('INSERT INTO department (id, name);');
+    console.log(addDepartment)
+    db.query('INSERT INTO department (name);');
     db.query(`VALUES("${addDepartment}");`);
    })
 
@@ -89,7 +90,7 @@ class Questionaire{
     },
     {
       type:'input',
-      message:'What is the Last name of the employee?',
+      message:'What is the last name of the employee?',
       name: 'addEmployeeLN',
     },
       {
@@ -107,6 +108,7 @@ class Questionaire{
   }
 
   async runUpdateEmployee(){
+
   await inquirer
   .prompt([
     {
@@ -122,15 +124,14 @@ class Questionaire{
 
   }
   runViewAllRoles(){
-  return db.query('SELECT * FROM role;');
-
+  return db.query('SELECT * FROM employee_db.role;');
   }
   runViewAllEmployees(){
-  return db.query('SELECT * FROM employee;');
+  return db.query('SELECT * FROM employee_db.employee;');
 
   }
   runViewAllDepartments(){
-  return db.query('SELECT * FROM department;');
+  return db.query('SELECT * FROM employee_db.department;');
 
   }
 
