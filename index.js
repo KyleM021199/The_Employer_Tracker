@@ -1,10 +1,9 @@
-
 const inquirer = require('inquirer');
+const db = require('./db/connection');
 
-    
 class Questionaire{
-  runOpChoice(){  
-    return inquirer
+  async runOpChoice(){  
+   await inquirer
     .prompt([
       {
       type:'list',
@@ -12,20 +11,21 @@ class Questionaire{
       name: 'opChoice',
       choices: ['Add Department', 'Add Role', 'Add Employee', 'Update Employee Role','View All Roles','View All Employees', 'View All Departments']
       }
-     ]) .then((respond) => {
-      if (respond === 'Add Department'){
+     ]).then(({opChoice}) => {
+      console.log(opChoice);
+      if (opChoice === 'Add Department'){
         this.runAddDepartment();
-      }else if(respond === 'Add Role'){
+      }else if(opChoice === 'Add Role'){
         this.runAddRole();
-      }else if(respond === 'Add Employee'){
-        this.runAddRole();
-      }else if(respond === 'Update Employee Role'){
+      }else if(opChoice === 'Add Employee'){
+        this.runAddEmployee();
+      }else if(opChoice === 'Update Employee Role'){
         this.runUpdateEmployee();
-      } else if(respond === 'View All Roles'){
+      } else if(opChoice === 'View All Roles'){
         this.runViewAllRoles();
-      } else if(respond === 'View All Employees'){
+      } else if(opChoice === 'View All Employees'){
         this.runViewAllEmployees();
-      } else if (respond === 'View All Departments'){
+      } else if (opChoice === 'View All Departments'){
         this.runViewAllDepartments();
       }
     }).catch((error) => {
@@ -33,39 +33,106 @@ class Questionaire{
       console.log(" Something went wrong.");
     });
 
-}
+  }
 
-runAddDepartment(){
+  async runAddDepartment(){
+    await inquirer
+  .prompt([
+    {
+    type:'input',
+    message:'What is the name of the department?',
+    name: 'addDepartment',
+    }
+   ]).then(({addDepartment}) => {
+    console.log("Running");
+    db.query('INSERT INTO department (id, name);');
+    db.query(`VALUES("${addDepartment}");`);
+   })
 
+  }
 
-}
+  async runAddRole(){
+  
+  await inquirer
+  .prompt([
+    {
+    type:'input',
+    message:'What is the name of the role?',
+    name: 'addRole',
+    },
+    {
+      type:'input',
+      message:'What is the salary of the role?',
+      name: 'addSalary',
+      },
+      {
+        type:'input',
+        message:'What department is attached to the role?',
+        name: 'attachedDepartment',
+        },
 
-runAddRole(){
+   ]).then(({addRole, addSalary, attachedDepartment}) => {
+    console.log("Running");
+    db.query(`
+    INSERT INTO role (id, title, salary, name);
+    VALUES("${addRole}, ${addSalary}, ${attachedDepartment}");`)
+   })
+  }
 
+  async runAddEmployee(){
+  await inquirer
+  .prompt([
+    {
+    type:'input',
+    message:'What is the first name of the employee?',
+    name: 'addEmployeeFN',
+    },
+    {
+      type:'input',
+      message:'What is the Last name of the employee?',
+      name: 'addEmployeeLN',
+    },
+      {
+        type:'input',
+        message:'What is the first name of the employee?',
+        name: 'addEmployeeFN',
+      },
 
-}
+    
+   ]).then((response) => {
+    console.log("Running");
 
-runAddEmployee(){
+   })
 
+  }
 
-}
+  async runUpdateEmployee(){
+  await inquirer
+  .prompt([
+    {
+    type:'list',
+    message:'What employee on the list will be update',
+    name: 'updateEmployee',
+    choices: []
+    }
+   ]).then((response) => {
+    console.log("Running");
 
-runUpdateEmployee(){
+   })
 
+  }
+  runViewAllRoles(){
+  return db.query('SELECT * FROM role;');
 
-}
-runViewAllRoles(){
+  }
+  runViewAllEmployees(){
+  return db.query('SELECT * FROM employee;');
 
+  }
+  runViewAllDepartments(){
+  return db.query('SELECT * FROM department;');
 
-}
-runViewAllEmployees(){
-
-
-}
-runViewAllDepartments(){
-
-
-}
+  }
 
 }
     
