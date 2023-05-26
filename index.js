@@ -3,6 +3,7 @@ const db = require('./db/connection');
 
 class Questionaire{
   async runOpChoice(){  
+   
    await inquirer
     .prompt([
       {
@@ -44,8 +45,7 @@ class Questionaire{
     name: 'addDepartment',
     }
    ]).then(({addDepartment}) => {
-    console.log("Running");
-    console.log(addDepartment)
+    console.log("Running")
     db.query('INSERT INTO department (name);');
     db.query(`VALUES("${addDepartment}");`);
    })
@@ -76,7 +76,9 @@ class Questionaire{
     console.log("Running");
     db.query(`
     INSERT INTO role (id, title, salary, name);
-    VALUES("${addRole}, ${addSalary}, ${attachedDepartment}");`)
+    VALUES("${addRole}, ${addSalary}, ${attachedDepartment}");`,(err, result) =>  {
+
+    });
    })
   }
 
@@ -124,16 +126,33 @@ class Questionaire{
 
   }
   runViewAllRoles(){
-  return db.query('SELECT * FROM employee_db.role;');
+  return db.query(`SELECT * FROM role;`, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    console.table(result);
+     });
   }
   runViewAllEmployees(){
-  return db.query('SELECT * FROM employee_db.employee;');
+  return db.query('SELECT * FROM employee;', (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    console.table(result);
+     });
 
   }
   runViewAllDepartments(){
-  return db.query('SELECT * FROM employee_db.department;');
-
+  return db.query('SELECT * FROM department;', (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    console.table(result);
+     });
+     
   }
+
+
 
 }
     
