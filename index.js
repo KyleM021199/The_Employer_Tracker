@@ -10,7 +10,7 @@ class Questionaire{
       type:'list',
       message:'Choose employee list operation:',
       name: 'opChoice',
-      choices: ['Add Department', 'Add Role', 'Add Employee', 'Update Employee Role','View All Roles','View All Employees', 'View All Departments']
+      choices: ['Add Department', 'Add Role', 'Add Employee', 'Update Employee Role','View All Roles','View All Employees', 'View All Departments', 'Exit']
       }
      ]).then(({opChoice}) => {
       console.log(opChoice);
@@ -28,6 +28,8 @@ class Questionaire{
         this.runViewAllEmployees();
       } else if (opChoice === 'View All Departments'){
         this.runViewAllDepartments();
+      }else if(opChoice === 'Exit'){
+        this.runExit();
       }
     }).catch((error) => {
       console.log(error);
@@ -46,14 +48,18 @@ class Questionaire{
     }
    ]).then(({addDepartment}) => {
     console.log("Running")
-    db.query('INSERT INTO department (name);');
-    db.query(`VALUES("${addDepartment}");`);
+    db.query(`
+    INSERT INTO department (name)
+    VALUES("${addDepartment}");`,(err, result) =>  {
+      console.log(`Added ${addDepartment} to Database`);
+      this.runOpChoice()
+    });
    })
 
   }
 
   async runAddRole(){
-  
+  let departments;
   await inquirer
   .prompt([
     {
@@ -67,22 +73,26 @@ class Questionaire{
       name: 'addSalary',
       },
       {
-        type:'input',
+        type:'list',
         message:'What department is attached to the role?',
         name: 'attachedDepartment',
+        choices:[],
         },
 
    ]).then(({addRole, addSalary, attachedDepartment}) => {
     console.log("Running");
     db.query(`
-    INSERT INTO role (id, title, salary, name);
+    SELECT * FROM role WHERE ${attachedDepartment};
+    INSERT INTO role (title, salary, department_id);
     VALUES("${addRole}, ${addSalary}, ${attachedDepartment}");`,(err, result) =>  {
-
+      console.log("Added Role to Database");
+      this.runOpChoice()
     });
    })
   }
 
   async runAddEmployee(){
+  let roles;
   await inquirer
   .prompt([
     {
@@ -96,9 +106,9 @@ class Questionaire{
       name: 'addEmployeeLN',
     },
       {
-        type:'input',
-        message:'What is the first name of the employee?',
-        name: 'addEmployeeFN',
+        type:'list',
+        message:`What is the employee's role?`,
+        name: 'addEmployeeRole',
       },
 
     
@@ -121,35 +131,44 @@ class Questionaire{
     }
    ]).then((response) => {
     console.log("Running");
-
+    
+    this.runOpChoice()
    })
 
   }
   runViewAllRoles(){
-  return db.query(`SELECT * FROM role;`, (err, result) => {
+  return db.query(`SELECT role.id, role.title, department.name, role.salary FROM role INNER JOIN department ON role.department_id = department.id;`, (err, result) => {
     if (err) {
       console.log(err);
     }
     console.table(result);
+    this.runOpChoice()
      });
   }
   runViewAllEmployees(){
-  return db.query('SELECT * FROM employee;', (err, result) => {
+  return db.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary, employee.manager_id FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id;', (err, result) => {
     if (err) {
       console.log(err);
     }
     console.table(result);
+    this.runOpChoice()
      });
 
   }
   runViewAllDepartments(){
+
   return db.query('SELECT * FROM department;', (err, result) => {
+    // const table = result.reduce((acc, {id, ...x}) => { acc[id] = x; return acc}, {})
     if (err) {
       console.log(err);
     }
     console.table(result);
+    this.runOpChoice()
      });
-     
+  }
+  runExit(){
+    return process.exit(); 
+
   }
 
 
